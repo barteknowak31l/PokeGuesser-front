@@ -1,19 +1,18 @@
 import React from "react";
-import { Route, Routes } from "react-router-dom";
+import PokemonDisplay from "../components/PokemonDisplay";
 
-import MainPage from "../pages/MainPage";
-import LoginPage from "../pages/LoginPage";
-import RegistrationPage from "../pages/RegistrationPage";
-import ProfilePage from "../pages/ProfilePage";
-
-const Page = () => {
+const Page = (props) => {
   return (
-    <Routes>
-      <Route path="/" element={<MainPage />} />
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/register" element={<RegistrationPage />} />
-      <Route path="/profile" element={<ProfilePage />} />
-    </Routes>
+    <>
+      <PokemonDisplay
+        pokemon={props.pokemon}
+        badStreak={props.badStreak}
+        callAPI={props.callAPI}
+        answer={props.answer}
+        setBadStreak={props.setBadStreak}
+        handleAnswerChange={props.handleAnswerChange}
+      />
+    </>
   );
 };
 
