@@ -1,15 +1,12 @@
+import Cookies from "js-cookie";
 import React from "react";
+import LoginForm from "../forms/LoginForm";
 class LoginPage extends React.Component {
   state = {
     email: "",
     password: "",
     errors: { password: false, email: false, badCredentials: false },
-  };
-
-  errors = {
-    password: "Password cannot be empty",
-    email: "Incorrect email",
-    badCredentials: "Incorrect credentials",
+    isApiLoginRequestPending: false,
   };
 
   handleChange = (e) => {
@@ -31,7 +28,7 @@ class LoginPage extends React.Component {
 
   handleLoginSubmit = (e) => {
     e.preventDefault();
-
+    this.clearErrorMessages();
     if (this.formValidation()) {
       this.callAPI();
     } else {
@@ -39,6 +36,17 @@ class LoginPage extends React.Component {
         password: "",
       }));
     }
+  };
+
+  clearErrorMessages = () => {
+    this.setState((prevState) => ({
+      errors: {
+        email: false,
+        password: false,
+        badCredentials: false,
+        isApiLoginRequestPending: false,
+      },
+    }));
   };
 
   formValidation = () => {
@@ -73,13 +81,17 @@ class LoginPage extends React.Component {
   };
 
   callAPI = () => {
-    const api = "http://127.0.0.1:8000/api/login";
+    const api = "http://127.0.0.1:8000/api/login_check";
+
+    if (this.state.isApiLoginRequestPending) return;
+
+    this.setState((prevState) => ({
+      isApiLoginRequestPending: true,
+    }));
 
     const credentials = {
-      credentials: {
-        login: this.state.email,
-        password: this.state.password,
-      },
+      username: this.state.email,
+      password: this.state.password,
     };
 
     const request = {
@@ -102,14 +114,12 @@ class LoginPage extends React.Component {
         this.setState((prevState) => ({
           email: "",
           password: "",
-          errors: {
-            email: false,
-            password: false,
-            badCredentials: false,
-          },
         }));
-        this.props.loginCallback();
-        this.props.loginRedirect("/");
+
+        this.clearErrorMessages();
+
+        this.props.loginCallback(data.token);
+        this.props.redirect("/");
       })
       .catch((error) => {
         console.error("Error:", error);
@@ -120,6 +130,7 @@ class LoginPage extends React.Component {
             password: prevState.errors.password,
             badCredentials: true,
           },
+          isApiLoginRequestPending: false,
         }));
       });
   };
@@ -127,61 +138,16 @@ class LoginPage extends React.Component {
   render() {
     return (
       <>
-        <form onSubmit={this.handleLoginSubmit} noValidate>
-          <div className="grid grid-cols-1">
-            <div className="flex basis-auto m-2">
-              <div className="basis-1/3 text-gray-500 text-center pr-2">
-                <label htmlFor="email">email</label>
-              </div>
-              <div className="basis-2/3">
-                <input
-                  className="w-full block text-white bg-gray-700 shadow-lg border border-gray-800 border-1 rounded-md"
-                  type="email"
-                  id="email"
-                  name="email"
-                  value={this.state.email}
-                  onChange={this.handleChange}
-                ></input>
-                {this.state.errors.email && (
-                  <div className="text-xs  text-red-800">
-                    {this.errors.email}
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <div className="flex basis-auto m-2">
-              <div className="basis-1/3 text-gray-500 text-center pr-2">
-                <label htmlFor="password">password</label>
-              </div>
-              <div className="basis-2/3">
-                <input
-                  className="w-full block text-white bg-gray-700 shadow-lg border border-gray-800 border-1 rounded-md"
-                  type="password"
-                  id="password"
-                  name="password"
-                  value={this.state.password}
-                  onChange={this.handleChange}
-                ></input>
-                {this.state.errors.password && (
-                  <div className="text-xs  text-red-800">
-                    {this.errors.password}
-                  </div>
-                )}
-              </div>
-            </div>
-            <div className="justify-self-center">
-              <button className="rounded-md bg-gray-800 w-full hover:bg-gray-700 transition shadow-lg border border-gray-800 px-5">
-                Log in
-              </button>
-              {this.state.errors.badCredentials && (
-                <div className="text-xs  text-red-800">
-                  {this.errors.badCredentials}
-                </div>
-              )}
-            </div>
-          </div>
-        </form>
+        <div className="h-full flex flex-cols items-center justify-center">
+          <LoginForm
+            email={this.state.email}
+            password={this.state.password}
+            errors={this.state.errors}
+            handleChange={this.handleChange}
+            handleLoginSubmit={this.handleLoginSubmit}
+            isApiLoginRequestPending={this.state.isApiLoginRequestPending}
+          ></LoginForm>
+        </div>
       </>
     );
   }
