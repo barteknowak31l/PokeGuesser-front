@@ -1,15 +1,43 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Cookies from "js-cookie";
+
+import BlankLetter from "./blankLetter";
 
 const PokemonDisplay = (props) => {
   const name = props.pokemon.pkmnName;
   let blanks = [];
 
+  const [answerMessage, setAnswerMessage] = useState("");
+  const [answerMessageCSS, setAnswerMessageCSS] = useState("");
+
+  useEffect(() => {
+    let iid = "";
+    if (props.badStreak > 0) {
+      setAnswerMessage("Wrong! Try again!");
+      setAnswerMessageCSS("text-center text-red-600 text-sm");
+      iid = setInterval(() => {
+        setAnswerMessage("");
+        setAnswerMessageCSS("");
+      }, 1000);
+    } else {
+      setAnswerMessage("Correct!");
+      setAnswerMessageCSS("text-center text-green-600 text-sm");
+      iid = setInterval(() => {
+        setAnswerMessage("");
+        setAnswerMessageCSS("");
+      }, 10000);
+    }
+
+    return () => {
+      clearInterval(iid);
+    };
+  }, [props.badStreak]);
+
   for (let i = 0; i < name.length; i++) {
     if (i + 1 <= props.badStreak) {
-      blanks.push(name[i]);
+      blanks.push(<BlankLetter key={i} letter={name[i]}></BlankLetter>);
     } else {
-      blanks.push("_");
+      blanks.push(<BlankLetter key={i} letter={"_"}></BlankLetter>);
     }
   }
 
@@ -27,7 +55,7 @@ const PokemonDisplay = (props) => {
   };
 
   const callAPIaddPokemon = () => {
-    const api = `http://127.0.0.1:8000/api/pokemon/add/${props.pokemon.id}`;
+    const api = `${props.api_link}/api/pokemon/add/${props.pokemon.id}`;
 
     const token = Cookies.get("jwtToken");
 
@@ -70,7 +98,7 @@ const PokemonDisplay = (props) => {
               ></img>
             </div>
             <div className="flex items-center justify-center my-2">
-              <div>{hiddenName}</div>
+              {hiddenName}
             </div>
 
             <div className="flex items-center justify-center text-gray-400">
@@ -101,6 +129,11 @@ const PokemonDisplay = (props) => {
                     submit
                   </button>
                 </div>
+                {props.badStreak > 0 ? (
+                  <div className="flex items-center justify-center mt-4">
+                    <span className={answerMessageCSS}>{answerMessage}</span>
+                  </div>
+                ) : null}
               </div>
             </div>
           </form>

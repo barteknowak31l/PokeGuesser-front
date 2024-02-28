@@ -27,6 +27,9 @@ class App extends React.Component {
     pokemonList: [],
   };
 
+  api_link = "https://main-bvxea6i-5httfntlm6xhu.de-2.platformsh.site";
+  //api_link = "http://127.0.0.1:8000";
+
   loginCallback = (_token) => {
     Cookies.set("jwtToken", _token);
     this.setState((prevState) => ({
@@ -78,9 +81,9 @@ class App extends React.Component {
 
     let api = "";
     if (generation === undefined) {
-      api = `http://127.0.0.1:8000/api/pokemon/${this.state.generation}`;
+      api = `${this.api_link}/api/pokemon/${this.state.generation}`;
     } else {
-      api = `http://127.0.0.1:8000/api/pokemon/${generation}`;
+      api = `${this.api_link}/api/pokemon/${generation}`;
     }
 
     const token = Cookies.get("jwtToken");
@@ -138,9 +141,9 @@ class App extends React.Component {
 
     let api = "";
     if (generation === undefined || generation instanceof Object) {
-      api = `http://127.0.0.1:8000/api/pokemon/all/${this.state.generation}`;
+      api = `${this.api_link}/api/pokemon/all/${this.state.generation}`;
     } else {
-      api = `http://127.0.0.1:8000/api/pokemon/all/${generation}`;
+      api = `${this.api_link}/api/pokemon/all/${generation}`;
     }
     const token = Cookies.get("jwtToken");
 
@@ -236,6 +239,7 @@ class App extends React.Component {
                   this.state.isProfileApiRequestPending
                 }
                 logged_in={this.state.logged_in}
+                api_link={this.api_link}
               />
             </div>
             <div className="basis-1/4  mr-2">
@@ -250,11 +254,11 @@ class App extends React.Component {
               </div>
             </div>
           </div>
-          <div className="bg-black mt-2 rounded-lg text-right pr-5 text-sm text-gray-600 transition">
+          <div className="mt-2 rounded-lg text-right pr-5 text-sm text-gray-600 transition ">
             Made by:{" "}
             <a
               className="hover:text-purple-900"
-              href="https://github.com/barteknowak31l"
+              href="https://github.com/barteknowak31l/PokeGuesser-front"
               target="_blank"
               rel="noreferrer noopener"
             >

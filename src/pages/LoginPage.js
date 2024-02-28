@@ -1,4 +1,3 @@
-import Cookies from "js-cookie";
 import React from "react";
 import LoginForm from "../forms/LoginForm";
 class LoginPage extends React.Component {
@@ -81,7 +80,8 @@ class LoginPage extends React.Component {
   };
 
   callAPI = () => {
-    const api = "http://127.0.0.1:8000/api/login_check";
+    //const api = "http://127.0.0.1:8000/api/login_check";
+    const api = `${this.props.api_link}/api/login_check`;
 
     if (this.state.isApiLoginRequestPending) return;
 
